@@ -1,53 +1,35 @@
 require('dotenv').config();
-
-// Server
 const express = require('express');
-const path = require('path');
-
-// Banco de dados
+const app = express();
 const mongoose = require('mongoose');
-const URL_BD = process.env.CONNECTIONSTRING;
-
-// dados de sessões ou cookies
+mongoose.connect(process.env.CONNECTIONSTRING,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
+  .then(() => {
+    app.emit('pronto');
+  })
+  .catch(e => console.log(e));
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
-
-// segurança
-const helmet = require('helmet');
-const csrf = require('csurf');
-
-// funções das rotas
-const { middlewareGlobal, checkCsrfError, csrfMiddleware } = require('./src/middlewares/middleware');
 const routes = require('./routes');
+const path = require('path');
+// const helmet = require('helmet'); // helmet começou a causar problemas no localhost por conta da falta de SSL
+const csrf = require('csurf');
+const { middlewareGlobal, checkCsrfError, csrfMiddleware } = require('./src/middlewares/middleware');
 
-// iniciando conexão com banco de dados
-mongoose.connect(URL_BD, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => {
-    console.log("Banco de dados conectado com sucesso")
-    app.emit('pronto')
-  })
-  .catch(e => console.log(e));
+// app.use(helmet()); // helmet começou a causar problemas no localhost por conta da falta de SSL
 
-// iniciando app 
-const app = express();
-
-// adicionando algumas medidas de segurança
-app.use(helmet());
-app.use(csrf());
-
-// adicionando arquivos estaticos, parseando de arquivos json e texto
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, 'public')));
 
-// criando configurações de sessões
 const sessionOptions = session({
-  secret: 'bananacomaveia',
-  store: MongoStore.create({ mongoUrl: URL_BD }),
+  secret: 'akasdfj0út23453456+54qt23qv  qwf qwer qwer qewr asdasdasda a6()',
+  store: MongoStore.create({ mongoUrl: process.env.CONNECTIONSTRING }),
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -55,24 +37,22 @@ const sessionOptions = session({
     httpOnly: true
   }
 });
-
-// utilizando as sessões
 app.use(sessionOptions);
 app.use(flash());
 
-// adicionando paginas e template engine
 app.set('views', path.resolve(__dirname, 'src', 'views'));
 app.set('view engine', 'ejs');
 
-// adicionando middlewares e rotas
+app.use(csrf());
+// Nossos próprios middlewares
 app.use(middlewareGlobal);
 app.use(checkCsrfError);
 app.use(csrfMiddleware);
 app.use(routes);
 
-// iniciando server
 app.on('pronto', () => {
   app.listen(process.env.PORT, () => {
-    console.log(`Server está rodando na porta http://localhost:${process.env.PORT}`)
-  })
+    console.log(`Acessar http://localhost:${process.env.PORT}`);
+    console.log(`Servidor executando na porta ${process.env.PORT}`);
+  });
 });

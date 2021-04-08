@@ -4,13 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon ./server.js --ignore public --ignore frontend",
+    "start": "nodemon server.js --ignore public --ignore frontend",
     "dev": "webpack -w"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^4.4.1",
     "core-js": "^3.10.0",
@@ -23,7 +24,8 @@
     "helmet": "^4.4.1",
     "mongoose": "^5.12.3",
     "regenerator-runtime": "^0.13.7",
-    "style-loader": "^2.0.0"
+    "style-loader": "^2.0.0",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",
